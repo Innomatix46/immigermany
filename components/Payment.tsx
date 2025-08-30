@@ -53,28 +53,28 @@ const Payment: React.FC<PaymentProps> = ({ onPaymentSuccess, onBack, price, deta
             // Save details to localStorage to retrieve after redirect
             localStorage.setItem('checkoutAppointmentDetails', JSON.stringify(details));
 
-            const stripe = (window as any).Stripe(STRIPE_LIVE_PUBLIC_KEY);
-            if (!stripe) {
-                throw new Error('Stripe.js has not loaded. Please try again.');
-            }
-            
-            const { error } = await stripe.redirectToCheckout({
-                lineItems: [{
-                    price: consultationOption.stripePriceId, // Use the Price ID from the passed consultation details
-                    quantity: 1,
-                }],
-                mode: 'payment',
-                successUrl: `${window.location.origin}?payment=success`,
-                cancelUrl: `${window.location.origin}?payment=cancel`,
-                customerEmail: details.email, // Prefill email
+            // Use API endpoint for creating checkout session
+            const response = await fetch('/api/create-checkout-session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    priceId: consultationOption.stripePriceId,
+                    customerEmail: details.email,
+                    appointmentDetails: details,
+                }),
             });
 
-            // This part is only reached if the redirect fails
-            if (error) {
-                console.error('Stripe redirect error:', error);
-                setStripeError(error.message);
-                setIsProcessing(false);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to create checkout session');
             }
+
+            const { url } = await response.json();
+            
+            // Redirect to Stripe Checkout
+            window.location.href = url;
 
         } catch (err: any) {
             console.error('Error preparing Stripe Checkout:', err);
