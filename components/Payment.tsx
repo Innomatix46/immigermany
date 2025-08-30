@@ -10,6 +10,7 @@ interface PaymentProps {
 }
 
 const STRIPE_LIVE_PUBLIC_KEY = process.env.STRIPE_PUBLIC_KEY || 'pk_live_51Rl8nWP0OXBFDAIs5mqRhh9atthTjfxC9DpXPhaQGCzd4LYWxBBqQrmq0kd6orkf8VuiJAzcH0CuRayqzPekdGm900pTg7NIl6';
+const PAYSTACK_PUBLIC_KEY = process.env.PAYSTACK_PUBLIC_KEY || 'pk_test_e201bcc36df323415e558f8b20f67d23b7d4035b';
 
 const Payment: React.FC<PaymentProps> = ({ onPaymentSuccess, onBack, price, details }) => {
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
@@ -82,11 +83,37 @@ const Payment: React.FC<PaymentProps> = ({ onPaymentSuccess, onBack, price, deta
         }
 
     } else if (selectedMethod === 'Paystack') {
-        // Simulate Paystack API call
-        setTimeout(() => {
+        try {
+            // Save details to localStorage to retrieve after redirect
+            localStorage.setItem('checkoutAppointmentDetails', JSON.stringify(details));
+            
+            const handler = (window as any).PaystackPop.setup({
+                key: PAYSTACK_PUBLIC_KEY,
+                email: details.email || 'customer@email.com', // Ensure email is always provided
+                amount: Math.round(price * 100), // Ensure integer amount in kobo
+                currency: 'NGN', // Nigerian Naira (Paystack default)
+                ref: `ref_${Date.now()}`, // Simpler reference format
+                channels: ['card', 'bank', 'ussd', 'mobile_money'], // Explicitly specify channels
+                callback: function(response: any) {
+                    // Payment completed successfully
+                    console.log('Paystack payment successful:', response);
+                    setIsProcessing(false);
+                    onPaymentSuccess('Paystack');
+                },
+                onClose: function() {
+                    // User closed the payment modal
+                    console.log('Paystack payment modal closed');
+                    setIsProcessing(false);
+                }
+            });
+            
+            handler.openIframe();
+            
+        } catch (err: any) {
+            console.error('Error initializing Paystack:', err);
             setIsProcessing(false);
-            onPaymentSuccess('Paystack');
-        }, 2000);
+            alert('Failed to initialize Paystack. Please check your internet connection and try again.');
+        }
     }
   };
   
@@ -102,7 +129,8 @@ const Payment: React.FC<PaymentProps> = ({ onPaymentSuccess, onBack, price, deta
 
   const renderPaystackMessage = () => (
       <div className="mt-6 p-4 border border-gray-200 rounded-lg bg-gray-50 text-center animate-fade-in">
-          <p className="text-sm text-gray-700">You will be redirected to Paystack to complete your payment securely.</p>
+          <p className="text-sm text-gray-700">A secure Paystack payment window will open for you to complete your payment.</p>
+          <p className="text-xs text-gray-500 mt-1">Supports cards, bank transfers, and mobile money payments.</p>
       </div>
   );
   
@@ -120,6 +148,7 @@ const Payment: React.FC<PaymentProps> = ({ onPaymentSuccess, onBack, price, deta
           <StripeIcon />
           <span className="ml-4 font-semibold text-lg">Pay with Stripe</span>
         </button>
+{/* Paystack temporarily disabled
         <button
           onClick={() => setSelectedMethod('Paystack')}
           className={`w-full flex items-center p-4 border-2 rounded-lg transition-all ${selectedMethod === 'Paystack' ? 'border-brand-blue bg-sky-50 shadow-md' : 'border-gray-200 hover:border-gray-400'}`}
@@ -127,6 +156,7 @@ const Payment: React.FC<PaymentProps> = ({ onPaymentSuccess, onBack, price, deta
           <PaystackIcon />
           <span className="ml-4 font-semibold text-lg">Pay with Paystack (For Africa)</span>
         </button>
+        */}
       </div>
 
       <div className="transition-all duration-300 min-h-[100px]">
