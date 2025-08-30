@@ -70,6 +70,7 @@ Neue Pakete hinzugefügt:
 - ⏸️ Paystack Integration implementiert aber deaktiviert
 - ✅ Vercel Deployment erfolgreich
 - ✅ Webhooks konfiguriert und bereit
+- ⚠️ Gemini API Key muss in Vercel hinzugefügt werden
 
 ---
 

@@ -338,7 +338,7 @@ const CVBuilder: React.FC = () => {
         `;
 
         try {
-            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+            const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY_HERE' });
             
             const coverLetterResponsePromise = ai.models.generateContent({
                 model: 'gemini-2.5-flash',

@@ -18,6 +18,11 @@ STRIPE_SECRET_KEY=sk_live_YOUR_STRIPE_SECRET_KEY_HERE
 STRIPE_WEBHOOK_SECRET=whsec_YOUR_WEBHOOK_SECRET_HERE
 ```
 
+### Für Gemini AI (CV Generator):
+```
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY_HERE
+```
+
 ### Optional für Paystack (wenn aktiviert):
 ```
 PAYSTACK_PUBLIC_KEY=pk_test_e201bcc36df323415e558f8b20f67d23b7d4035b
