@@ -47,4 +47,12 @@ export const CONSULTATION_OPTIONS: ConsultationOption[] = [
     defaultPrice: '40',
     stripePriceId: 'price_1S1cMpP0OXBFDAIs9OT51CEX',
   },
+  {
+    id: 'initial_consultation',
+    title: 'Initial Immigration Consultation',
+    description: '30-minute 1-on-1 video consultation to analyze your personal situation and answer all your questions about immigrating to Germany.',
+    priceKey: 'initialConsultationPrice',
+    defaultPrice: '20',
+    stripePriceId: 'price_1S2D5bP0OXBFDAIsrhLsKv0e',
+  },
 ];
